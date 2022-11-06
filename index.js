@@ -1,124 +1,130 @@
 class Parser {
-  constructor(raw) {
-    this.lines = raw.toString().split('\n');
+    constructor(raw) {
+        this.lines = raw.toString().split('\n');
 
-    this.mode = 'constructors';
+        this.mode = 'constructors';
 
-    this.constructors = [];
-    this.methods = [];
+        this.constructors = [];
+        this.methods = [];
+        this.layer = 0;
 
-    this.parse();
-  }
-
-  parse() {
-    const { lines } = this;
-
-    lines.forEach((line) => {
-      line = line.replace(';', '').trim();
-
-      if (line === '' || line.indexOf('//') === 0) {
-        return;
-      }
-
-      this.parseLine(line);
-    });
-  }
-
-  parseLine(line) {
-    if (line === '---functions---') {
-      this.mode = 'methods';
-
-      return;
+        this.parse();
     }
 
-    if (this.mode === 'constructors') {
-      return this.parseConstructor(line);
-    }
+    parse() {
+        const { lines } = this;
 
-    if (this.mode === 'methods') {
-      return this.parseMethod(line);
-    }
+        lines.forEach((line) => {
+            line = line.replace(';', '').trim();
 
-    throw Error(`Mode ${this.mode} is not support`);
-  }
+            if (line.indexOf('// LAYER') === 0) {
+                let lineLayer = line.split(' ');
+                this.layer = parseInt(lineLayer[2]);
+                return;
+            }
 
-  parseConstructor(line) {
-    const splitedLine = line.split('=');
+            if (line === '' || line.indexOf('//') === 0) {
+                return;
+            }
 
-    const body = splitedLine[0].trim();
-    const type = splitedLine[1].trim();
-
-    const [predicateWithId, ...paramsAsArray] = body.split(' ');
-
-    const [predicate, idAsString] = predicateWithId.split('#');
-    const id = parseInt(idAsString, 16);
-
-    const isVector = predicate === 'vector';
-
-    const params = isVector
-      ? []
-      : paramsAsArray.map((param) => {
-          const [paramName, paramType] = param.split(':');
-
-          return {
-            name: paramName,
-            type: paramType,
-          };
+            this.parseLine(line);
         });
+    }
 
-    this.constructors.push({
-      id,
-      predicate,
-      params,
-      type,
-    });
-  }
+    parseLine(line) {
+        if (line === '---functions---') {
+            this.mode = 'methods';
 
-  parseMethod(line) {
-    const splitedLine = line.split('=');
-
-    const body = splitedLine[0].trim();
-    const type = splitedLine[1].trim();
-
-    const [predicateWithId, ...paramsAsArray] = body.split(' ');
-
-    const [method, idAsString] = predicateWithId.split('#');
-    const id = parseInt(idAsString, 16);
-
-    const params = paramsAsArray
-      .filter((param) => {
-        if (param[0] === '{' && param[param.length - 1] === '}') {
-          return false;
+            return;
         }
 
-        return true;
-      })
-      .map((param) => {
-        const [paramName, paramType] = param.split(':');
+        if (this.mode === 'constructors') {
+            return this.parseConstructor(line);
+        }
 
-        return {
-          name: paramName,
-          type: paramType,
-        };
-      });
+        if (this.mode === 'methods') {
+            return this.parseMethod(line);
+        }
 
-    this.methods.push({
-      id,
-      method,
-      params,
-      type,
-    });
-  }
+        throw Error(`Mode ${this.mode} is not support`);
+    }
 
-  getJS() {
-    const { constructors, methods } = this;
+    parseConstructor(line) {
+        const splitedLine = line.split('=');
 
-    return { constructors, methods };
-  }
+        const body = splitedLine[0].trim();
+        const type = splitedLine[1].trim();
 
-  getJSON() {
-    return JSON.stringify(this.getJS());
-  }
+        const [predicateWithId, ...paramsAsArray] = body.split(' ');
+
+        const [predicate, idAsString] = predicateWithId.split('#');
+        const id = parseInt(idAsString, 16);
+
+        const isVector = predicate === 'vector';
+
+        const params = isVector ? [] :
+            paramsAsArray.map((param) => {
+                const [paramName, paramType] = param.split(':');
+
+                return {
+                    name: paramName,
+                    type: paramType,
+                };
+            });
+
+        this.constructors.push({
+            id,
+            predicate,
+            params,
+            type,
+        });
+    }
+
+    parseMethod(line) {
+        const splitedLine = line.split('=');
+
+        const body = splitedLine[0].trim();
+        const type = splitedLine[1].trim();
+
+        const [predicateWithId, ...paramsAsArray] = body.split(' ');
+
+        const [method, idAsString] = predicateWithId.split('#');
+        const id = parseInt(idAsString, 16);
+
+        const params = paramsAsArray
+            .filter((param) => {
+                if (param[0] === '{' && param[param.length - 1] === '}') {
+                    return false;
+                }
+
+                return true;
+            })
+            .map((param) => {
+                const [paramName, paramType] = param.split(':');
+
+                return {
+                    name: paramName,
+                    type: paramType,
+                };
+            });
+
+        this.methods.push({
+            id,
+            method,
+            params,
+            type,
+        });
+    }
+
+    getJS() {
+        const { constructors, methods, layer } = this;
+
+        return { constructors, methods, layer };
+    }
+
+    getJSON() {
+        return JSON.stringify(this.getJS());
+    }
 }
 
 module.exports = { Parser };

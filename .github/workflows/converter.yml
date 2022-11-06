@@ -1,0 +1,33 @@
+on:
+  workflow_dispatch: {} # Allow manually kicking off builds
+  schedule:
+    - cron:  '0 */5 * * *'
+name: convert TL to JSON
+jobs:
+  build:
+    name: Scrape
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+    - name: converter
+      run: |
+        wget https://github.com/telegramdesktop/tdesktop/raw/dev/Telegram/Resources/tl/api.tl
+        node bin.js api.tl tdesktop.json
+        rm api.tl
+        git add tdesktop.json
+        git config user.email "johnprestonmail@gmail.com"
+        git config user.name "GitHub Action <John Preston>"
+        git commit -m "update tDesktop API scheme"
+        wget https://github.com/tdlib/td/raw/master/td/generate/scheme/telegram_api.tl
+        node bin.js telegram_api.tl tdlib.json
+        rm telegram_api.tl
+        git add tdlib.json
+        git config user.email "levlam@telegram.org"
+        git config user.name "GitHub Action <Aliaksei Levin>"
+        git commit -am "update TDLib API scheme"
+        git push origin master
