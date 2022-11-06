@@ -23,11 +23,4 @@ jobs:
         git config user.email "johnprestonmail@gmail.com"
         git config user.name "GitHub Action <John Preston>"
         git commit -m "update tDesktop API scheme"
-        wget https://github.com/tdlib/td/raw/master/td/generate/scheme/telegram_api.tl
-        node bin.js telegram_api.tl tdlib.json
-        rm telegram_api.tl
-        git add tdlib.json
-        git config user.email "levlam@telegram.org"
-        git config user.name "GitHub Action <Aliaksei Levin>"
-        git commit -am "update TDLib API scheme"
         git push origin master
