@@ -32,6 +32,11 @@ class Parser {
     }
 
     parseLine(line) {
+        if (line === '---types---') {
+            this.mode = 'constructors';
+
+            return;
+        }
         if (line === '---functions---') {
             this.mode = 'methods';
 
