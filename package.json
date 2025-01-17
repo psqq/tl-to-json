@@ -22,5 +22,12 @@
     "url": "https://github.com/psqq/tl-to-json/issues"
   },
   "author": "Sergey Pestov <pestov-sa@ya.ru>",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/psqq/tl-to-json.git"
+  }
 }
