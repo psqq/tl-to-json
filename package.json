@@ -1,5 +1,5 @@
 {
-  "name": "tl-to-json",
+  "name": "@psqq/tl-to-json",
   "version": "1.0.0",
   "description": "Convert TL (Type Language) into JSON",
   "keywords": [
@@ -12,12 +12,15 @@
     "telegram",
     "library"
   ],
-  "main": "index.js",
-  "bin": "./bin.js",
-  "homepage": "https://github.com/alik0211/tl-to-json#readme",
-  "bugs": {
-    "url": "https://github.com/alik0211/tl-to-json/issues"
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "tl-to-json": "bin/cli.js"
   },
-  "author": "Ali Gasymov <alik0211alik@gmail.com> (https://gasymov.com/)",
+  "homepage": "https://github.com/psqq/tl-to-json#readme",
+  "bugs": {
+    "url": "https://github.com/psqq/tl-to-json/issues"
+  },
+  "author": "Sergey Pestov <pestov-sa@ya.ru>",
   "license": "GPL-3.0"
 }

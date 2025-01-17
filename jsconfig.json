@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "allowJs": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "Node16",
+        "moduleResolution": "node16",
+        "checkJs": true,
+        "baseUrl": ".",
+        "downlevelIteration": true,
+        "paths": {
+            "#src/*": [
+                "./src/*"
+            ]
+        }
+    }
+}
