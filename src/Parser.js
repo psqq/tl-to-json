@@ -30,6 +30,25 @@ export class Comment {
     }
 }
 
+/**
+ * @param {string} hexString 
+ */
+function hexStringToInt32(hexString) {
+    if (hexString.length !== 8) {
+        throw new Error(`Hex string must be 8 characters long but got ${JSON.stringify(hexString)}`);
+    }
+
+    let buf = new ArrayBuffer(4);
+    let view = new DataView(buf);
+    for (let i = 0; i < 4; i++) {
+        let byte = parseInt(hexString.substring(i * 2, i * 2 + 2), 16);
+        view.setUint8(i, byte);
+    }
+    let int32Value = view.getInt32(0);
+
+    return int32Value;
+}
+
 export class Parser {
     /**
      * @param {string} raw
@@ -43,6 +62,10 @@ export class Parser {
         this.entities = [];
 
         this.currentSpaceEntity = null;
+
+        this.int32Ids = false;
+        /** @type {string[]} */
+        this.skipPredicates = [];
     }
 
     parse() {
@@ -110,6 +133,17 @@ export class Parser {
     }
 
     /**
+     * @param {string} idAsString 
+     */
+    parseId(idAsString) {
+        if (this.int32Ids) {
+            return hexStringToInt32(idAsString.padStart(8, '0'));
+        } else {
+            return parseInt(idAsString, 16);
+        }
+    }
+
+    /**
      * @param {string} line
      */
     parseConstructor(line) {
@@ -121,7 +155,12 @@ export class Parser {
         const [predicateWithId, ...paramsAsArray] = body.split(' ');
 
         const [predicate, idAsString] = predicateWithId.split('#');
-        const id = parseInt(idAsString, 16);
+
+        if (this.skipPredicates.includes(predicate)) {
+            return;
+        }
+
+        const id = this.parseId(idAsString);
 
         const isVector = predicate === 'vector';
 
@@ -157,7 +196,7 @@ export class Parser {
         const [predicateWithId, ...paramsAsArray] = body.split(' ');
 
         const [method, idAsString] = predicateWithId.split('#');
-        const id = parseInt(idAsString, 16);
+        const id = idAsString ? this.parseId(idAsString) : 0;
 
         const params = paramsAsArray
             .filter((param) => {

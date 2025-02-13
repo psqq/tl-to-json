@@ -4,7 +4,51 @@ import { EntitiesJson } from '../src/EntitiesJson.js';
 import { TdApiJson } from '../src/TdApiJson.js';
 import { DefaultJson } from '../src/DefaultJson.js';
 
-const [nodePath, thisFile, tlFile, jsonFile, convertType, indent] = process.argv;
+let args = process.argv.slice(2);
+const [tlFile, jsonFile, convertType, ...restArgs] = args;
+let indent = '';
+let int32Ids = false;
+/** @type {string[]} */
+let skipPredicates = [];
+
+/**
+ * @type {{name: string; argsCount: number; onValue: (...args: string[]) => void;}[]}
+ */
+const options = [
+    {
+        name: '--indent',
+        argsCount: 1,
+        onValue(val) {
+            indent = val;
+        }
+    },
+    {
+        name: '--int32-ids',
+        argsCount: 1,
+        onValue(val) {
+            int32Ids = val === 'true';
+        }
+    },
+    {
+        name: '--skip-predicates',
+        argsCount: 1,
+        onValue(val) {
+            skipPredicates = val.split(',');
+        }
+    },
+];
+
+let i = 0;
+while_loop: while (i < restArgs.length) {
+    for (const option of options) {
+        if (option.name === restArgs[i] && i + option.argsCount < restArgs.length) {
+            option.onValue(...restArgs.slice(i + 1, i + 1 + option.argsCount));
+            i += 1 + option.argsCount;
+            continue while_loop;
+        }
+    }
+    i++;
+}
 
 if (!tlFile) {
     console.log('No input tl file');
@@ -23,21 +67,24 @@ if (!convertType) {
 
 const tlFileContent = (await fs.readFile(tlFile)).toString('utf-8');
 
-let json = null;
+/** @type {EntitiesJson | TdApiJson | DefaultJson} */
+let converter;
 
 if (convertType === 'entities') {
-    const converter = new EntitiesJson(tlFileContent);
-    json = converter.makeJson();
+     converter = new EntitiesJson(tlFileContent);
 } else if (convertType === 'tdapi') {
-    const converter = new TdApiJson(tlFileContent);
-    json = converter.makeJson();
+     converter = new TdApiJson(tlFileContent);
 } else if (convertType === 'default') {
-    const converter = new DefaultJson(tlFileContent);
-    json = converter.makeJson();
+     converter = new DefaultJson(tlFileContent);
 } else {
     console.error('Unknown type of converter', convertType);
     process.exit(1);
 }
+
+converter.parser.int32Ids = int32Ids;
+converter.parser.skipPredicates = skipPredicates;
+
+const json = converter.makeJson();
 
 if (!json) {
     console.error('No json after convert by', convertType);
