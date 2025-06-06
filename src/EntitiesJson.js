@@ -1,3 +1,4 @@
+//@ts-check
 import { Comment, Parser, Space, TlConstructor, TlMethod } from './Parser.js';
 
 export class EntitiesJson {

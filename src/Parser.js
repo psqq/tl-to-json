@@ -1,3 +1,5 @@
+//@ts-check
+
 export class Space {
     constructor() {
         this.eolCount = 0;

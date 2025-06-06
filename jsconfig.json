@@ -9,12 +9,6 @@
         "module": "Node16",
         "moduleResolution": "node16",
         "checkJs": true,
-        "baseUrl": ".",
-        "downlevelIteration": true,
-        "paths": {
-            "#src/*": [
-                "./src/*"
-            ]
-        }
+        "downlevelIteration": true
     }
 }

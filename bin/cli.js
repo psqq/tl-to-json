@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+//@ts-check
 import { promises as fs } from 'fs';
 import { EntitiesJson } from '../src/EntitiesJson.js';
 import { TdApiJson } from '../src/TdApiJson.js';
