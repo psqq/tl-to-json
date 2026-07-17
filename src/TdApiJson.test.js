@@ -36,3 +36,29 @@ test('Multiline comments', async () => {
         methods: [],
     });
 });
+
+test('may be null', async () => {
+    const tlStr = String(
+        await fs.promises.readFile(path.join(import.meta.dirname, '../tests/data/2.tl')),
+    );
+    const result = new TdApiJson(tlStr).makeJson();
+    assert.deepStrictEqual(result, {
+        classes: [],
+        constructors: [
+            {
+                id: NaN,
+                predicate: 'stickerFullTypeRegular',
+                params: [
+                    {
+                        name: 'premium_animation',
+                        type: 'file',
+                        description: 'Premium animation of the sticker; may be null. If present, only Telegram Premium users can use the sticker',
+                    },
+                ],
+                type: 'StickerFullType',
+                description: 'The sticker is a regular sticker',
+            },
+        ],
+        methods: [],
+    });
+});

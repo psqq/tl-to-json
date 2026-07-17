@@ -18,3 +18,9 @@ Concrete example:
 ```sh
 npx @psqq/tl-to-json schema.tl schema.json entities 4
 ```
+
+# tests
+
+```sh
+node --test
+```

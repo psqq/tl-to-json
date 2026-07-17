@@ -74,7 +74,7 @@ export class Parser {
         const { lines } = this;
 
         lines.forEach((line) => {
-            line = line.replace(';', '').trim();
+            line = line.trim();
 
             if (line === '') {
                 if (!this.currentSpaceEntity) {
@@ -152,7 +152,7 @@ export class Parser {
         const splittedLine = line.split('=');
 
         const body = splittedLine[0].trim();
-        const type = splittedLine[1].trim();
+        const type = splittedLine[1].trim().replace(';', '');
 
         const [predicateWithId, ...paramsAsArray] = body.split(' ');
 
@@ -193,7 +193,7 @@ export class Parser {
         const splittedLine = line.split('=');
 
         const body = splittedLine[0].trim();
-        const type = splittedLine[1].trim();
+        const type = splittedLine[1].trim().replace(';', '');
 
         const [predicateWithId, ...paramsAsArray] = body.split(' ');
 
